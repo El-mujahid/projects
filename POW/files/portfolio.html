@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mujahid Daud — Web Developer, Lagos</title>
+<meta name="description" content="I build fast, mobile-first websites for small businesses in Lagos that don't have one yet — and turn browsers into bookings.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F0EEE8;
+    --graphite:#131419;
+    --panel:#E4E1D8;
+    --panel-line:rgba(19,20,25,0.12);
+    --indigo:#3546D6;
+    --indigo-deep:#242F9E;
+    --violet:#7C3AED;
+    --amber:#E8952B;
+    --grayed:#A8A59C;
+    --hair:rgba(19,20,25,0.12);
+    --hair-dark:rgba(240,238,232,0.14);
+    --radius:16px;
+    --maxw:1160px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.01ms !important; transition-duration:0.01ms !important; scroll-behavior:auto !important;}
+  }
+  body{
+    margin:0; background:var(--paper); color:var(--graphite);
+    font-family:'Inter',sans-serif; line-height:1.6; -webkit-font-smoothing:antialiased;
+    overflow-x:hidden; position:relative;
+  }
+  h1,h2,h3{font-family:'Space Grotesk',sans-serif; margin:0; letter-spacing:-0.01em;}
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  .wrap{max-width:var(--maxw); margin:0 auto; padding:0 28px;}
+  section{padding:110px 0; position:relative;}
+  @media (max-width:720px){section{padding:68px 0;}}
+  a{color:inherit;}
+  img{max-width:100%; display:block;}
+
+  /* grain overlay */
+  .grain{
+    position:fixed; inset:0; z-index:3; pointer-events:none; opacity:0.045; mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* scroll progress */
+  .progress{position:fixed; top:0; left:0; height:3px; width:0%; z-index:200;
+    background:linear-gradient(90deg,var(--indigo),var(--violet),var(--amber)); transition:width .1s linear;}
+
+  /* cursor glow (desktop only, added via JS) */
+  .cursor-glow{
+    position:fixed; width:380px; height:380px; border-radius:50%; pointer-events:none; z-index:2;
+    background:radial-gradient(circle, rgba(124,58,237,0.14), rgba(53,70,214,0.06) 45%, transparent 72%);
+    transform:translate(-50%,-50%); left:-999px; top:-999px; will-change:transform;
+  }
+
+  /* NAV */
+  header{position:fixed; top:0; left:0; right:0; z-index:100; background:rgba(240,238,232,0.78); backdrop-filter:blur(14px); border-bottom:1px solid var(--hair);}
+  .nav{display:flex; align-items:center; justify-content:space-between; padding:18px 28px; max-width:var(--maxw); margin:0 auto;}
+  .brand{font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:18px;}
+  .brand .dot{color:var(--amber);}
+  .navlinks{display:flex; gap:30px; list-style:none; margin:0; padding:0; align-items:center;}
+  .navlinks a{font-size:14.5px; text-decoration:none; color:var(--graphite); opacity:0.7; transition:opacity .2s ease; position:relative;}
+  .navlinks a:hover{opacity:1;}
+  .nav-cta{
+    font-family:'IBM Plex Mono',monospace; font-size:13px; background:var(--graphite); color:var(--paper);
+    padding:10px 18px; border-radius:100px; text-decoration:none; transition:transform .25s cubic-bezier(.2,.8,.2,1), box-shadow .25s ease;
+  }
+  .nav-cta:hover{transform:translateY(-2px); box-shadow:0 10px 22px rgba(19,20,25,0.22);}
+  .burger{display:none; flex-direction:column; gap:5px; background:none; border:0; cursor:pointer;}
+  .burger span{width:22px; height:2px; background:var(--graphite);}
+  @media (max-width:760px){
+    .navlinks{position:fixed; top:62px; right:0; height:calc(100vh - 62px); width:78%; background:var(--paper);
+      flex-direction:column; align-items:flex-start; padding:36px 28px; gap:22px; transform:translateX(100%);
+      transition:transform .35s cubic-bezier(.2,.8,.2,1); border-left:1px solid var(--hair);}
+    .navlinks.open{transform:translateX(0);}
+    .burger{display:flex;}
+  }
+
+  /* HERO */
+  .hero{padding-top:170px; padding-bottom:0; overflow:hidden;}
+  .hero-bg{position:absolute; inset:0; z-index:-1; overflow:hidden;}
+  .orb{position:absolute; border-radius:50%; filter:blur(70px); opacity:0.35; animation:float 14s ease-in-out infinite;}
+  .orb1{width:420px; height:420px; background:var(--indigo); top:-160px; right:-100px;}
+  .orb2{width:340px; height:340px; background:var(--violet); top:120px; left:-140px; animation-delay:-6s;}
+  .orb3{width:260px; height:260px; background:var(--amber); bottom:-100px; right:20%; opacity:0.22; animation-delay:-3s;}
+  @keyframes float{0%,100%{transform:translate(0,0) scale(1);}50%{transform:translate(30px,-24px) scale(1.06);}}
+
+  .hero .eyebrow{font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--indigo-deep); letter-spacing:0.04em;
+    opacity:0; animation:riseIn .7s cubic-bezier(.2,.8,.2,1) .1s forwards;}
+  .hero h1{font-size:clamp(36px,5.8vw,62px); line-height:1.05; margin:16px 0 22px; max-width:820px;}
+  .hero h1 .line{display:block; overflow:hidden;}
+  .hero h1 .line span{display:block; opacity:0; transform:translateY(100%); animation:riseIn .8s cubic-bezier(.2,.8,.2,1) forwards;}
+  .hero h1 .line:nth-child(1) span{animation-delay:.18s;}
+  .hero h1 .line:nth-child(2) span{animation-delay:.32s;}
+  @keyframes riseIn{to{opacity:1; transform:translateY(0);}}
+  .grad-text{
+    background:linear-gradient(100deg,var(--indigo) 0%,var(--violet) 45%,var(--amber) 85%);
+    background-size:220% auto; -webkit-background-clip:text; background-clip:text; color:transparent;
+    animation:gradShift 7s ease-in-out infinite;
+  }
+  @keyframes gradShift{0%,100%{background-position:0% 50%;}50%{background-position:100% 50%;}}
+  .hero p{font-size:17px; color:#5b5b54; max-width:520px; margin-bottom:34px;
+    opacity:0; animation:riseIn .7s cubic-bezier(.2,.8,.2,1) .5s forwards;}
+  .btn-row{display:flex; gap:14px; flex-wrap:wrap; opacity:0; animation:riseIn .7s cubic-bezier(.2,.8,.2,1) .62s forwards;}
+  .btn{font-family:'IBM Plex Mono',monospace; font-size:13.5px; padding:14px 26px; border-radius:100px; text-decoration:none;
+    display:inline-flex; align-items:center; gap:8px; transition:transform .3s cubic-bezier(.2,.8,.2,1), box-shadow .3s ease, background .3s ease;
+    cursor:pointer; border:1px solid transparent;}
+  .btn-primary{background:var(--graphite); color:var(--paper);}
+  .btn-primary:hover{transform:translateY(-3px); box-shadow:0 14px 28px rgba(19,20,25,0.26);}
+  .btn-ghost{border-color:var(--graphite); color:var(--graphite);}
+  .btn-ghost:hover{transform:translateY(-3px); background:var(--graphite); color:var(--paper);}
+
+  /* BEFORE/AFTER TOGGLE */
+  .demo{margin-top:52px; max-width:640px; opacity:0; animation:riseIn .7s cubic-bezier(.2,.8,.2,1) .74s forwards;}
+  .toggle-row{display:flex; align-items:center; gap:14px; margin-bottom:18px;}
+  .toggle-label{font-family:'IBM Plex Mono',monospace; font-size:12.5px; letter-spacing:0.04em; color:#5b5b54; transition:color .2s ease;}
+  .toggle-label.active{color:var(--graphite); font-weight:600;}
+  .switch{position:relative; width:52px; height:28px; background:var(--grayed); border-radius:100px; cursor:pointer; border:0; transition:background .3s ease;}
+  .switch.on{background:var(--indigo);}
+  .switch::after{content:''; position:absolute; top:3px; left:3px; width:22px; height:22px; border-radius:50%; background:#fff; transition:transform .3s cubic-bezier(.2,.8,.2,1);}
+  .switch.on::after{transform:translateX(24px);}
+  .mockframe{border-radius:var(--radius); border:1px solid var(--hair); overflow:hidden; background:rgba(255,255,255,0.7);
+    backdrop-filter:blur(10px); box-shadow:0 24px 50px rgba(19,20,25,0.12);}
+  .mockbar{display:flex; gap:6px; padding:10px 14px; background:rgba(233,231,224,0.9); border-bottom:1px solid var(--hair);}
+  .mockbar span{width:9px; height:9px; border-radius:50%; background:#c9c6bc;}
+  .mockbody{padding:34px 28px; min-height:220px; transition:all .4s ease;}
+  .mockbody.before{background:#EDEBE4; filter:grayscale(1);}
+  .mockbody.before .biz-name{font-size:20px; font-weight:700;}
+  .mockbody.before .biz-tag{color:#8a8a82; font-size:13px; margin:6px 0 20px;}
+  .mockbody.before .dm-box{display:inline-flex; align-items:center; gap:8px; border:1px dashed #8a8a82; padding:10px 16px; border-radius:100px; font-family:'IBM Plex Mono',monospace; font-size:12px;}
+  .mockbody.after{background:linear-gradient(135deg,rgba(255,255,255,0.9),rgba(124,58,237,0.08));}
+  .mockbody.after .biz-name{font-size:20px; font-weight:700; color:var(--indigo-deep);}
+  .mockbody.after .biz-tag{color:#5b5b54; font-size:13px; margin:6px 0 22px;}
+  .after-row{display:flex; gap:10px; flex-wrap:wrap;}
+  .after-pill{background:var(--indigo); color:#fff; padding:9px 16px; border-radius:100px; font-size:12.5px; font-family:'IBM Plex Mono',monospace;}
+  .after-pill.ghost{background:transparent; border:1px solid var(--indigo); color:var(--indigo-deep);}
+  .after-note{margin-top:18px; font-size:12.5px; color:#5b5b54; font-family:'IBM Plex Mono',monospace;}
+
+  /* MARQUEE */
+  .marquee-band{border-top:1px solid var(--hair); border-bottom:1px solid var(--hair); background:var(--panel); margin-top:80px; overflow:hidden;}
+  .marquee-track{display:flex; width:max-content; gap:56px; padding:20px 0; animation:marquee 26s linear infinite;}
+  .marquee-track span{font-family:'IBM Plex Mono',monospace; font-size:14px; color:#6b6a61; white-space:nowrap; display:flex; align-items:center; gap:12px;}
+  .marquee-track span::before{content:'◆'; color:var(--amber); font-size:8px;}
+  @keyframes marquee{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+  /* REVEAL */
+  .reveal{opacity:0; transform:translateY(22px); transition:opacity .7s cubic-bezier(.2,.8,.2,1), transform .7s cubic-bezier(.2,.8,.2,1);}
+  .reveal.in{opacity:1; transform:translateY(0);}
+  .reveal-clip{opacity:0; clip-path:inset(0 0 100% 0); transition:opacity .6s ease, clip-path .8s cubic-bezier(.2,.8,.2,1);}
+  .reveal-clip.in{opacity:1; clip-path:inset(0 0 0% 0);}
+  .underline-draw{position:relative; display:inline-block;}
+  .underline-draw::after{content:''; position:absolute; left:0; bottom:-6px; height:2px; width:0; background:linear-gradient(90deg,var(--indigo),var(--amber)); transition:width .8s cubic-bezier(.2,.8,.2,1) .2s;}
+  .reveal.in .underline-draw::after{width:100%;}
+
+  .sec-head{max-width:560px; margin-bottom:50px;}
+  .sec-head .eyebrow{font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--indigo-deep);}
+  .sec-head h2{font-size:clamp(26px,3.4vw,38px); margin-top:14px;}
+  .services .sec-head .eyebrow{color:var(--amber);}
+
+  /* ABOUT */
+  .about-grid{display:grid; grid-template-columns:0.82fr 1.18fr; gap:64px; align-items:center;}
+  .photo-wrap{position:relative;}
+  .photo-blob{position:absolute; inset:-30px; z-index:-1; background:linear-gradient(150deg,var(--indigo),var(--violet)); filter:blur(46px); opacity:0.35; border-radius:40%;}
+  .photo-frame{position:relative; border-radius:22px; padding:7px; background:linear-gradient(160deg,var(--indigo),var(--violet)); aspect-ratio:4/5;
+    transform:rotate(-1.2deg); transition:transform .4s cubic-bezier(.2,.8,.2,1); will-change:transform;}
+  .photo-frame img{width:100%; height:100%; object-fit:cover; border-radius:16px; display:block;}
+  .badge-pill{position:absolute; bottom:-16px; left:20px; background:var(--graphite); color:var(--paper);
+    padding:9px 16px 9px 12px; border-radius:100px; font-family:'IBM Plex Mono',monospace; font-size:12px;
+    display:flex; align-items:center; gap:8px; box-shadow:0 10px 24px rgba(19,20,25,0.25);}
+  .badge-dot{width:7px; height:7px; border-radius:50%; background:#6fcf97; box-shadow:0 0 0 0 rgba(111,207,151,0.6); animation:pulse 2.2s ease-out infinite;}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(111,207,151,0.55);}70%{box-shadow:0 0 0 8px rgba(111,207,151,0);}100%{box-shadow:0 0 0 0 rgba(111,207,151,0);}}
+  .about-copy p{color:#4a4a43; font-size:16px; margin-bottom:16px; max-width:480px;}
+  .about-list{list-style:none; margin:26px 0 0; padding:0; display:grid; gap:14px;}
+  .about-list li{display:flex; gap:12px; align-items:flex-start; font-size:14.5px; color:var(--graphite);}
+  .about-list .ico{font-family:'IBM Plex Mono',monospace; color:var(--indigo); flex-shrink:0;}
+  @media (max-width:840px){.about-grid{grid-template-columns:1fr; gap:40px;} .photo-frame{max-width:320px; margin:0 auto;}}
+
+  /* SERVICES */
+  .services{background:var(--graphite); color:var(--paper);}
+  .svc-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:20px;}
+  .svc-card{background:rgba(240,238,232,0.05); border:1px solid var(--hair-dark); border-radius:var(--radius); padding:26px 22px;
+    transition:border-color .3s ease, transform .3s cubic-bezier(.2,.8,.2,1), background .3s ease;}
+  .svc-card:hover{border-color:var(--amber); transform:translateY(-6px); background:rgba(240,238,232,0.08);}
+  .svc-card .num{font-family:'IBM Plex Mono',monospace; color:var(--amber); font-size:13px;}
+  .svc-card h3{font-size:16.5px; margin:14px 0 8px; font-family:'Inter',sans-serif; font-weight:600;}
+  .svc-card p{font-size:13.5px; color:#b8b6ae; margin:0;}
+  @media (max-width:980px){.svc-grid{grid-template-columns:1fr 1fr;}}
+  @media (max-width:560px){.svc-grid{grid-template-columns:1fr;}}
+
+  /* WORK */
+  .work-grid{display:grid; grid-template-columns:1fr 1fr; gap:28px;}
+  .work-card{border-radius:var(--radius); overflow:hidden; border:1px solid var(--hair); background:var(--panel);
+    transition:transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s ease;}
+  .work-card:hover{transform:translateY(-8px); box-shadow:0 28px 46px rgba(19,20,25,0.14);}
+  .work-thumb{aspect-ratio:16/10; display:flex; align-items:center; justify-content:center; color:#fff;
+    font-family:'Space Grotesk',sans-serif; font-size:22px; text-align:center; padding:20px;}
+  .work-body{padding:24px;}
+  .work-body .tag{font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--indigo-deep); text-transform:uppercase; letter-spacing:0.05em;}
+  .work-body h3{font-size:19px; margin:10px 0 8px;}
+  .work-body p{font-size:14px; color:#5b5b54; margin:0 0 16px;}
+  .work-link{font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--indigo); text-decoration:none; border-bottom:1px solid var(--indigo);}
+  .work-card.placeholder{border-style:dashed; border-width:2px; background:transparent;}
+  .work-card.placeholder .work-thumb{background:transparent; border:2px dashed var(--hair); color:var(--grayed);}
+  .work-card.placeholder .work-body p{font-style:italic;}
+  @media (max-width:780px){.work-grid{grid-template-columns:1fr;}}
+
+  /* PROCESS */
+  .process{background:var(--graphite); color:var(--paper);}
+  .steps{display:grid; grid-template-columns:repeat(3,1fr); gap:30px;}
+  .step{border-top:1px solid var(--hair-dark); padding-top:20px;}
+  .step .stepnum{font-family:'IBM Plex Mono',monospace; color:var(--amber); font-size:13px;}
+  .step h3{font-size:19px; margin:12px 0 8px;}
+  .step p{font-size:14px; color:#b8b6ae; margin:0;}
+  @media (max-width:780px){.steps{grid-template-columns:1fr;}}
+
+  /* CONTACT */
+  .contact-panel{position:relative; background:linear-gradient(135deg,var(--indigo),var(--violet)); color:#fff; border-radius:26px; padding:68px 56px; text-align:center; overflow:hidden;}
+  .contact-panel::before{content:''; position:absolute; inset:0; background:radial-gradient(circle at 80% 20%, rgba(255,255,255,0.16), transparent 55%);}
+  .contact-panel h2{font-size:clamp(28px,4vw,44px); margin-bottom:16px; position:relative;}
+  .contact-panel p{color:rgba(255,255,255,0.88); max-width:480px; margin:0 auto 34px; position:relative;}
+  .contact-panel .btn-row{justify-content:center; position:relative; animation:none; opacity:1;}
+  .contact-panel .btn-primary{background:#fff; color:var(--indigo-deep);}
+  .contact-panel .btn-ghost{border-color:rgba(255,255,255,0.5); color:#fff;}
+  .contact-panel .btn-ghost:hover{background:#fff; color:var(--indigo-deep);}
+  @media (max-width:720px){.contact-panel{padding:44px 24px;}}
+
+  footer{padding:34px 0; text-align:center; font-family:'IBM Plex Mono',monospace; font-size:12.5px; color:#8a8a82;}
+</style>
+</head>
+<body>
+
+<div class="grain"></div>
+<div class="progress" id="progressBar"></div>
+<div class="cursor-glow" id="cursorGlow"></div>
+
+<header>
+  <nav class="nav">
+    <div class="brand">Mujahid Daud<span class="dot">.</span></div>
+    <ul class="navlinks" id="navlinks">
+      <li><a href="#about">About</a></li>
+      <li><a href="#services">Services</a></li>
+      <li><a href="#work">Work</a></li>
+      <li><a href="#process">Process</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <a href="#contact" class="nav-cta">Let's talk</a>
+    <button class="burger" id="burger" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+  </nav>
+</header>
+
+<section class="hero">
+  <div class="hero-bg"><div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div></div>
+  <div class="wrap">
+    <p class="eyebrow mono">WEB DEVELOPER · LAGOS, NIGERIA</p>
+    <h1>
+      <span class="line"><span>I build the website your</span></span>
+      <span class="line"><span>business doesn't have <span class="grad-text">yet.</span></span></span>
+    </h1>
+    <p>Fast, mobile-first sites for businesses currently running on Instagram DMs and phone calls — built to turn visitors into bookings, not just likes.</p>
+    <div class="btn-row">
+      <a href="#work" class="btn btn-primary">See the work →</a>
+      <a href="#contact" class="btn btn-ghost">Get a free mockup</a>
+    </div>
+
+    <div class="demo">
+      <div class="toggle-row">
+        <span class="toggle-label active mono" id="labelBefore">INSTAGRAM ONLY</span>
+        <button class="switch" id="switchDemo" aria-label="Toggle before and after"></button>
+        <span class="toggle-label mono" id="labelAfter">WITH A WEBSITE</span>
+      </div>
+      <div class="mockframe">
+        <div class="mockbar"><span></span><span></span><span></span></div>
+        <div class="mockbody before" id="mockBody">
+          <div class="biz-name">Beauty Box Spa</div>
+          <div class="biz-tag">@beautybox.ng · 2,174 followers</div>
+          <div class="dm-box">💬 DM to book — reply time varies</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="marquee-band">
+    <div class="marquee-track" id="marqueeTrack"></div>
+  </div>
+</section>
+
+<section id="about">
+  <div class="wrap about-grid">
+    <div class="photo-wrap reveal" id="photoWrap">
+      <div class="photo-blob"></div>
+      <div class="photo-frame" id="photoFrame">
+        <!-- To swap the photo: replace src below with your image filename, kept in the same folder as this HTML file -->
+        <img src="profile.jpg" alt="Mujahid Daud">
+      </div>
+      <div class="badge-pill"><span class="badge-dot"></span>Available for freelance work</div>
+    </div>
+    <div class="about-copy reveal">
+      <p class="eyebrow mono">ABOUT</p>
+      <h2 style="font-size:clamp(26px,3.2vw,38px); margin:14px 0 18px;">Engineering background. <span class="underline-draw">Developer's instincts.</span></h2>
+      <p>I'm an engineering student in Lagos — so before anything ships, it's measured, load-tested, and checked twice. That habit carries straight into how I build websites: nothing goes live until it actually works, on every screen size, for every visitor.</p>
+      <p>I focus on small businesses that are doing well offline but invisible online — the ones still running bookings through Instagram DMs and phone calls. My job is to close that gap, fast.</p>
+      <ul class="about-list">
+        <li><span class="ico">→</span>Civil & Electrical Engineering student, University of Ilorin</li>
+        <li><span class="ico">→</span>WhatsApp-first communication — no chasing emails</li>
+        <li><span class="ico">→</span>Free mockup before any commitment</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="services" id="services">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="eyebrow mono">WHAT I DO</p>
+      <h2>Four ways to fix "we don't have a website."</h2>
+    </div>
+    <div class="svc-grid">
+      <div class="svc-card reveal"><div class="num mono">01</div><h3>Business websites</h3><p>A real home for your business online — service menu, pricing, photos, contact, all in one place.</p></div>
+      <div class="svc-card reveal"><div class="num mono">02</div><h3>Booking-ready sites</h3><p>WhatsApp click-to-book, forms, and maps built in — so people don't have to DM just to ask "are you open?"</p></div>
+      <div class="svc-card reveal"><div class="num mono">03</div><h3>Redesigns & refreshes</h3><p>Already have a site but it looks dated or doesn't work on mobile? I'll rebuild it properly.</p></div>
+      <div class="svc-card reveal"><div class="num mono">04</div><h3>Landing pages</h3><p>One focused page for a launch, event, or offer — built fast, built to convert.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="work">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="eyebrow mono">SELECTED WORK</p>
+      <h2>Recent projects.</h2>
+    </div>
+    <div class="work-grid" id="workGrid"></div>
+  </div>
+</section>
+
+<section class="process" id="process">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="eyebrow mono">HOW IT WORKS</p>
+      <h2>Three steps, start to launch.</h2>
+    </div>
+    <div class="steps">
+      <div class="step reveal"><div class="stepnum mono">01 / DISCOVERY</div><h3>Quick chat</h3><p>A short call or WhatsApp message about your business, what you need the site to do, and who it's for.</p></div>
+      <div class="step reveal"><div class="stepnum mono">02 / BUILD</div><h3>Design & build</h3><p>You get a free mockup first — nothing to pay until you've seen exactly what your site will look like.</p></div>
+      <div class="step reveal"><div class="stepnum mono">03 / LAUNCH</div><h3>Handover</h3><p>Site goes live, you get shown how to update it yourself, and I'm on WhatsApp for anything after.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="wrap">
+    <div class="contact-panel reveal">
+      <h2>Let's build yours.</h2>
+      <p>Send your business name and I'll put together a free mockup — no commitment, just something you can actually see first.</p>
+      <div class="btn-row">
+        <a href="https://wa.me/234XXXXXXXXXX" target="_blank" rel="noopener" class="btn btn-primary">Message on WhatsApp →</a>
+        <a href="mailto:you@email.com" class="btn btn-ghost">Email instead</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>© 2026 Mujahid Daud — Web Developer, Lagos.</p>
+</footer>
+
+<script>
+  /* ============================================================
+     PROJECTS — edit this array to add/remove work. Nothing else
+     on the page needs to change. Copy the object below the last
+     entry, fill in your own details, keep the comma before it.
+
+     {
+       title: "Project name",
+       tag: "Category · one-line type",
+       description: "1-2 sentence summary of what it does.",
+       link: "https://your-live-link.com",
+       gradient: "linear-gradient(135deg,#COLOR1,#COLOR2)"
+     }
+     ============================================================ */
+  const projects = [
+    {
+      title: "PATKINGS Homes",
+      tag: "Hospitality · Short-let booking",
+      description: "Serviced duplex apartment site in Ikeja — WhatsApp-first booking flow, amenities, live map, guest reviews.",
+      link: "#",
+      gradient: "linear-gradient(135deg,#3546D6,#131419)"
+    }
+  ];
+
+  function renderProjects(){
+    const grid = document.getElementById('workGrid');
+    let html = '';
+    projects.forEach(p => {
+      html += `<div class="work-card reveal-clip">
+        <div class="work-thumb" style="background:${p.gradient}">${p.title}</div>
+        <div class="work-body">
+          <div class="tag mono">${p.tag}</div>
+          <h3>${p.title}</h3>
+          <p>${p.description}</p>
+          <a href="${p.link}" class="work-link" target="_blank" rel="noopener">View project →</a>
+        </div>
+      </div>`;
+    });
+    if(projects.length % 2 !== 0){
+      html += `<div class="work-card placeholder reveal-clip">
+        <div class="work-thumb">+ Next project</div>
+        <div class="work-body">
+          <div class="tag mono">Coming soon</div>
+          <h3>More work in progress</h3>
+          <p>Add your next project to the <code>projects</code> array in the code.</p>
+        </div>
+      </div>`;
+    }
+    grid.innerHTML = html;
+    document.querySelectorAll('.reveal-clip').forEach(el => clipIO.observe(el));
+  }
+
+  /* Skills marquee — edit this list freely */
+  const skills = ["HTML / CSS / JavaScript","React","WordPress","Webflow","Responsive Design","WhatsApp Integration","Figma to Code","SEO Basics"];
+  const track = document.getElementById('marqueeTrack');
+  [...skills, ...skills].forEach(s => { const el = document.createElement('span'); el.textContent = s; track.appendChild(el); });
+
+  // Mobile menu
+  const burger = document.getElementById('burger');
+  const navlinks = document.getElementById('navlinks');
+  burger.addEventListener('click', () => navlinks.classList.toggle('open'));
+  navlinks.querySelectorAll('a').forEach(a => a.addEventListener('click', () => navlinks.classList.remove('open')));
+
+  // Reveal on scroll (fade-up)
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  // Reveal on scroll (clip-path) — used by project cards
+  const clipIO = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); clipIO.unobserve(e.target); } });
+  }, { threshold: 0.1 });
+
+  renderProjects();
+
+  // Before/after toggle
+  const sw = document.getElementById('switchDemo');
+  const mockBody = document.getElementById('mockBody');
+  const labelBefore = document.getElementById('labelBefore');
+  const labelAfter = document.getElementById('labelAfter');
+  let on = false;
+  sw.addEventListener('click', () => {
+    on = !on;
+    sw.classList.toggle('on', on);
+    labelBefore.classList.toggle('active', !on);
+    labelAfter.classList.toggle('active', on);
+    if (on) {
+      mockBody.className = 'mockbody after';
+      mockBody.innerHTML = `
+        <div class="biz-name">Beauty Box Spa</div>
+        <div class="biz-tag">Nail & beauty studio · Ikeja</div>
+        <div class="after-row">
+          <span class="after-pill">Book on WhatsApp</span>
+          <span class="after-pill ghost">View services</span>
+        </div>
+        <div class="after-note">✓ Live availability · ✓ Google-searchable · ✓ Instant replies</div>`;
+    } else {
+      mockBody.className = 'mockbody before';
+      mockBody.innerHTML = `
+        <div class="biz-name">Beauty Box Spa</div>
+        <div class="biz-tag">@beautybox.ng · 2,174 followers</div>
+        <div class="dm-box">💬 DM to book — reply time varies</div>`;
+    }
+  });
+
+  // Scroll progress bar
+  const progressBar = document.getElementById('progressBar');
+  window.addEventListener('scroll', () => {
+    const h = document.documentElement;
+    const scrolled = (h.scrollTop) / (h.scrollHeight - h.clientHeight) * 100;
+    progressBar.style.width = scrolled + '%';
+  });
+
+  // Cursor glow + photo tilt — desktop pointer only
+  if (window.matchMedia('(pointer: fine)').matches) {
+    const glow = document.getElementById('cursorGlow');
+    let gx = -999, gy = -999, cx = -999, cy = -999;
+    window.addEventListener('mousemove', (e) => { gx = e.clientX; gy = e.clientY; });
+    (function loop(){
+      cx += (gx - cx) * 0.12; cy += (gy - cy) * 0.12;
+      glow.style.transform = `translate(${cx}px, ${cy}px) translate(-50%,-50%)`;
+      requestAnimationFrame(loop);
+    })();
+
+    const photoFrame = document.getElementById('photoFrame');
+    const photoWrap = document.getElementById('photoWrap');
+    photoWrap.addEventListener('mousemove', (e) => {
+      const r = photoWrap.getBoundingClientRect();
+      const px = (e.clientX - r.left) / r.width - 0.5;
+      const py = (e.clientY - r.top) / r.height - 0.5;
+      photoFrame.style.transform = `rotate(${-1.2 + px * 6}deg) rotateX(${py * -6}deg) rotateY(${px * 6}deg)`;
+    });
+    photoWrap.addEventListener('mouseleave', () => { photoFrame.style.transform = 'rotate(-1.2deg)'; });
+  } else {
+    document.getElementById('cursorGlow').style.display = 'none';
+  }
+</script>
+
+</body>
+</html>
